@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Wegweiser für Lehrpersonen: in acht Stationen von der Idee über Ethik- und Datenschutz-Check bis zu Test und Feedback einer eigenen Lernapp.">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Lernapp-Wegweiser</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Caveat:wght@500;700&display=swap">
+<style>
+/* Layout: whiteboard-like station route on the left, one station at a time on the right, marker-style handwriting accents */
+:root{
+  --bg:#eef2f8;          /* whiteboard surface */
+  --panel:#ffffff;
+  --ink:#1b2433;         /* marker black-blue */
+  --muted:#556176;
+  --line:#d4dbe7;
+  --accent:#1f6f5c;      /* green board marker */
+  --accent-soft:#dcefe8;
+  --marker:#c2410c;      /* red marker for loops / warnings */
+  --marker-soft:#fbe7dc;
+  --done:#1f6f5c;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-hand:"Caveat", "Comic Sans MS", cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121821; --panel:#1a2230; --ink:#e6ebf3; --muted:#9aa6ba; --line:#2c3748;
+  --accent:#5cc4a6; --accent-soft:#1d3a33; --marker:#f08a5d; --marker-soft:#3a2419; --done:#5cc4a6;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#121821; --panel:#1a2230; --ink:#e6ebf3; --muted:#9aa6ba; --line:#2c3748;
+  --accent:#5cc4a6; --accent-soft:#1d3a33; --marker:#f08a5d; --marker-soft:#3a2419; --done:#5cc4a6;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--marker);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:24px}
+header.top h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.05;margin:0;text-wrap:balance;letter-spacing:-.01em}
+header.top h1 .hand{font-family:var(--f-hand);font-weight:700;color:var(--accent);font-size:1.15em;letter-spacing:0}
+header.top p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.progress{min-width:220px;flex:0 1 280px}
+.progress .lbl{font-size:.85rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+
+/* Station route */
+nav.route{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 16px)}
+nav.route ol{list-style:none;margin:0;padding:0;position:relative}
+nav.route li{position:relative}
+nav.route button{all:unset;cursor:pointer;display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:center;width:100%;padding:7px 10px;border-radius:10px;box-sizing:border-box}
+nav.route button:hover{background:var(--panel)}
+nav.route button[aria-current="step"]{background:var(--panel);box-shadow:0 0 0 2px var(--accent) inset}
+nav.route .num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:.9rem;border:2px solid var(--ink);background:var(--bg);position:relative;z-index:1}
+nav.route .sub .num{width:26px;height:26px;font-size:.78rem;margin-left:3px}
+nav.route .done .num{background:var(--done);border-color:var(--done);color:var(--panel)}
+nav.route .t{font-weight:700;line-height:1.25}
+nav.route .t small{display:block;font-weight:400;color:var(--muted);font-size:.82rem}
+nav.route ol::before{content:"";position:absolute;left:27px;top:20px;bottom:20px;width:2px;background:var(--line)}
+.loopnote{font-family:var(--f-hand);color:var(--marker);font-size:1.25rem;line-height:1.1;margin:10px 0 0 10px;display:flex;gap:6px;align-items:flex-start}
+.loopnote svg{flex:none}
+@media (max-width:860px){
+  nav.route{position:static}
+  nav.route ol{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+  nav.route ol::before{display:none}
+  nav.route button{grid-template-columns:auto;justify-items:center;width:auto;padding:6px}
+  nav.route .t{display:none}
+  .loopnote{display:none}
+}
+
+/* Station card */
+main.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:clamp(20px,3.5vw,40px);min-width:0}
+.eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+main h2{font-family:var(--f-display);font-weight:800;font-size:clamp(1.6rem,3vw,2.2rem);line-height:1.1;margin:.2em 0 .15em;text-wrap:balance}
+.board{font-family:var(--f-hand);font-size:1.45rem;color:var(--muted);margin:0 0 18px}
+.lead{font-size:1.08rem;max-width:65ch}
+main h3{font-family:var(--f-display);font-weight:700;font-size:1.12rem;margin:28px 0 10px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px 28px}
+.cols>div{min-width:0}
+ul.plain{margin:0;padding-left:1.2em}
+ul.plain li{margin:4px 0}
+
+.check{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.check label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid var(--line)}
+.check input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent);flex:none}
+.check label:has(input:checked){background:var(--accent-soft);border-color:transparent}
+
+.callout{border-radius:12px;padding:14px 16px;margin:18px 0 0;background:var(--accent-soft)}
+.callout.warn{background:var(--marker-soft)}
+.callout b.k{font-family:var(--f-display);display:block;margin-bottom:4px}
+.callout.warn b.k{color:var(--marker)}
+
+.prompt{position:relative;margin-top:10px}
+.prompt pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:14px 16px 46px;margin:0;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.88rem;line-height:1.5}
+.btn{font:inherit;font-weight:700;cursor:pointer;border-radius:10px;padding:10px 16px;border:2px solid var(--ink);background:var(--panel);color:var(--ink)}
+.btn:hover{background:var(--bg)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.loop{border-color:var(--marker);color:var(--marker)}
+.btn.small{padding:6px 12px;font-size:.85rem}
+.prompt .btn{position:absolute;right:10px;bottom:10px}
+
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.links a{display:block;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.links a:hover{border-color:var(--accent)}
+.links a b{color:var(--accent)}
+.links a span{display:block;font-size:.86rem;color:var(--muted)}
+
+.gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.gloss details{border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.gloss summary{cursor:pointer;font-weight:700}
+.gloss p{margin:6px 0 0;font-size:.95rem;color:var(--muted)}
+
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.form label{display:grid;gap:4px;font-weight:700;font-size:.92rem}
+.form input,.form textarea,.form select{font:inherit;font-weight:400;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.form textarea{min-height:70px;resize:vertical}
+.form .full{grid-column:1/-1}
+
+.verdict{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.verdict .chip{padding:6px 12px;border-radius:99px;font-weight:700;font-size:.9rem;background:var(--bg);border:1px solid var(--line)}
+.verdict .chip.on{background:var(--accent);color:var(--panel);border-color:var(--accent)}
+.verdict .chip.stop.on{background:var(--marker);border-color:var(--marker)}
+
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:34px;padding-top:20px;border-top:1px solid var(--line)}
+footer{color:var(--muted);font-size:.85rem;margin-top:24px;max-width:75ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Wie kommst du als Lehrperson zur eigenen <span class="hand">Lernapp?</span></h1>
+      <p>Ein Wegweiser für Lehrpersonen: Station für Station von der ersten Idee über Ethik- und Datenschutz-Check bis zum Test mit der Klasse.</p>
+    </div>
+    <div class="progress" aria-live="polite">
+      <div class="lbl"><span>Erledigte Punkte</span><span id="progTxt">0 / 0</span></div>
+      <div class="bar"><i id="progBar"></i></div>
+      <div style="margin-top:8px;text-align:right"><button class="btn small" id="resetBtn" type="button">Häkchen zurücksetzen</button></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="route" aria-label="Stationen">
+      <ol id="routeList"></ol>
+      <div class="loopnote">
+        <svg width="26" height="40" viewBox="0 0 26 40" aria-hidden="true"><path d="M20 38 C2 30 2 10 18 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M12 2 L19 4 L15 10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Feedback führt zurück zu «Wunsch». Der Prozess ist eine Schlaufe.</span>
+      </div>
+    </nav>
+    <main class="card" id="stage" tabindex="-1"></main>
+  </div>
+
+  <footer>Die Häkchen und Eingaben bleiben nur in diesem Browser gespeichert. Links führen zu externen Seiten. Kantonale Vorgaben (Datenschutz, zugelassene Tools) gehen immer vor: im Zweifel bei der Schulleitung oder der ICT-Fachstelle nachfragen.</footer>
+</div>
+
+<script>
+// ---------- Content: one entry per station ----------
+const STEPS = [
+{
+  id:"start", num:"0", title:"Erstes Mal?", sub:"Vokabular & Niveau", board:"1. Mal? → Vokabular & Niveau",
+  lead:"Bevor es losgeht: Wie viel Erfahrung bringst du mit? Wer zum ersten Mal mit einer KI eine App baut, braucht ein paar Begriffe. Wer schon Erfahrung hat, kann direkt zur Station 1.",
+  level:true,
+  gloss:[
+    ["Prompt","Die Anweisung, die du der KI gibst. Je klarer Ziel, Zielgruppe und Grenzen beschrieben sind, desto besser das Resultat."],
+    ["Spezifikation","Eine kurze, schriftliche Beschreibung, was die App können soll und was nicht. Sie ist dein Massstab beim Testen."],
+    ["Prototyp","Eine erste, lauffähige Version zum Ausprobieren. Darf unfertig sein, soll aber die Kernidee zeigen."],
+    ["Web-App / PWA","Eine App, die im Browser läuft und sich auf dem iPad wie eine App auf den Homescreen legen lässt. Keine Installation über einen App-Store nötig."],
+    ["Hosting","Der Ort, wo die App im Internet liegt, damit Kinder sie öffnen können (z. B. GitHub Pages oder ein Schulserver)."],
+    ["Personendaten","Alle Angaben, die sich einer Person zuordnen lassen: Name, Foto, Stimme, Lernstand. Bei Kindern besonders schützenswert."],
+    ["Automatisiertes Testen","Kleine Prüfprogramme, die die App selbständig durchklicken und Fehler melden, z. B. nach jeder Änderung."],
+    ["Iteration","Eine Runde im Kreislauf: bauen, testen, Rückmeldung holen, verbessern."],
+  ],
+  check:[
+    "Ich weiss, was ein Prompt und ein Prototyp ist.",
+    "Ich habe ein KI-Werkzeug, das an meiner Schule erlaubt ist.",
+    "Ich habe meinen Erfahrungsstand oben gewählt.",
+  ],
+  links:[
+    ["https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview","Prompting-Grundlagen","Anleitung von Anthropic (englisch)"],
+    ["https://www.lehrplan21.ch","Lehrplan 21","Modul Medien und Informatik als Bezugsrahmen"],
+  ]
+},
+{
+  id:"rahmen", num:"1", title:"Vorstellung / Rahmen", sub:"Wer, wo, womit?", board:"Vorstellung / Rahmen",
+  lead:"Halte fest, in welchem Rahmen die App entsteht. Diese Angaben gibst du später der KI mit, damit sie nicht an deiner Realität vorbei plant.",
+  cols:[
+    ["Leitfragen",["Welche Stufe, welches Fach, welche Klasse?","Welche Geräte haben die Kinder (iPad, Laptop, Smartboard)?","Gibt es Internet im Schulzimmer? Kopfhörer?","Wie viel Zeit habe ich für die Entwicklung?","Wer entscheidet mit (Schulleitung, ICT-Verantwortliche, Team)?"]],
+    ["Typische Rahmenbedingungen",["Keine Logins für Kinder nötig","Läuft offline oder mit wenig Datenverkehr","Grosse Schrift, grosse Tasten, wenig Text","Keine Werbung, keine externen Tracker"]],
+  ],
+  check:[
+    "Stufe, Fach und Lernziel sind notiert.",
+    "Ich kenne die Geräte und die Netzsituation.",
+    "Ich weiss, welche Tools an meiner Schule erlaubt sind.",
+    "Zeitbudget und Ansprechpersonen sind geklärt.",
+  ],
+  links:[
+    ["https://www.lehrplan21.ch","Lehrplan 21","Kompetenzen nachschlagen und Lernziel verankern"],
+    ["https://www.educa.ch","educa","Fachagentur für digitale Bildung in der Schweiz"],
+  ]
+},
+{
+  id:"wunsch", num:"2", title:"Wunsch / Spezifikation", sub:"inkl. Adressat:innen", board:"Wunsch / Spezifikation (inkl. Adressat:innen) ↺ Rückfragen",
+  lead:"Beschreibe so konkret wie möglich, was die App können soll und für wen. Lass die KI ausdrücklich Rückfragen stellen, bevor sie etwas baut. Das ist die kleine Schlaufe auf dem Whiteboard.",
+  form:true,
+  check:[
+    "Die Zielgruppe ist beschrieben (Alter, Lesefähigkeit, besondere Bedürfnisse).",
+    "Das Lernziel steht in einem Satz.",
+    "Ich habe festgehalten, was die App NICHT können soll.",
+    "Die KI hat Rückfragen gestellt und ich habe sie beantwortet.",
+  ],
+  callout:["Rückfragen-Schlaufe","Bitte die KI: «Stelle mir zuerst alle Fragen, die du brauchst, bevor du etwas programmierst.» Beantworte sie und wiederhole, bis keine offenen Punkte mehr da sind."],
+  links:[
+    ["https://udlguidelines.cast.org","Universal Design for Learning","Leitlinien, damit die App für möglichst viele Kinder passt"],
+    ["https://www.w3.org/WAI/standards-guidelines/wcag/","Barrierefreiheit (WCAG)","Standards für zugängliche Webinhalte"],
+  ]
+},
+{
+  id:"ethik", num:"3", title:"Ethik-Check", sub:"Braucht's das? Pädagogischer Mehrwert", board:"Ethik-Check / Braucht's das? / Päd. Mehrwert",
+  lead:"Halte kurz inne. Nicht jede gute Idee braucht eine App. Prüfe, ob die App das Lernen wirklich unterstützt und niemanden ausschliesst oder unter Druck setzt.",
+  ethics:true,
+  cols:[
+    ["Braucht's das?",["Gibt es schon ein gutes, erlaubtes Angebot dafür?","Wäre eine analoge Lösung genauso gut (Karten, Würfel, Gespräch)?","Ersetzt die App Beziehung oder unterstützt sie sie?"]],
+    ["Pädagogischer Mehrwert",["Was können die Kinder mit der App, was sie ohne nicht könnten?","Bekommen sie direkte, ermutigende Rückmeldung?","Fördert sie Selbständigkeit oder nur Klicken?"]],
+    ["Fairness & Wohlbefinden",["Keine Ranglisten oder Vergleiche, die beschämen","Keine Suchtmechanik (endlose Belohnungen, Zeitdruck)","Inhalte frei von Stereotypen","Alle Kinder können sie bedienen"]],
+  ],
+  check:[
+    "Ich kann den Mehrwert in einem Satz begründen.",
+    "Ich habe Alternativen ohne App bedacht.",
+    "Die App enthält keine beschämenden oder süchtig machenden Elemente.",
+  ],
+  links:[
+    ["https://www.unesco.org/en/digital-education/artificial-intelligence","UNESCO: KI in der Bildung","Leitlinien zum verantwortungsvollen Einsatz (englisch)"],
+    ["https://www.jugendundmedien.ch","Jugend und Medien","Nationale Plattform zur Förderung von Medienkompetenzen"],
+  ]
+},
+{
+  id:"plan", num:"4", title:"Umsetzungsplan", sub:"inkl. Beratung", board:"Umsetzungsplan inkl. Beratung",
+  lead:"Lass dir von der KI einen Plan erstellen, bevor gebaut wird. Bespreche ihn mit einer Fachperson oder einer Kollegin, die schon Erfahrung hat.",
+  cols:[
+    ["Was in den Plan gehört",["Aufbau der App: Bildschirme, Ablauf","Technik: Web-App, wo gehostet, offline?","Welche Bilder, Töne, Texte gebraucht werden und woher sie kommen (Lizenzen!)","Reihenfolge der Arbeitsschritte","Was im ersten Prototyp drin ist und was später kommt"]],
+    ["Beratung holen bei",["ICT-Verantwortlichen der Schule","Kolleg:innen mit KI-Erfahrung","PH-Beratungsstellen Medien und Informatik","Heilpädagogik, wenn Kinder mit besonderen Bedürfnissen die App nutzen"]],
+  ],
+  prompt:"Erstelle zuerst nur einen Umsetzungsplan, noch keinen Code.\nBeschreibe:\n1. Aufbau und Ablauf der App (Bildschirme)\n2. Welche Technik du vorschlägst und warum\n3. Welche Bilder, Töne und Texte nötig sind und unter welcher Lizenz\n4. Welche Daten die App speichert (wenn möglich: keine)\n5. Was in einen ersten, kleinen Prototyp gehört\nWarte auf meine Freigabe, bevor du programmierst.",
+  check:[
+    "Der Plan liegt schriftlich vor.",
+    "Eine zweite Person hat den Plan angeschaut.",
+    "Herkunft und Lizenz von Bildern und Tönen sind geklärt.",
+  ],
+  links:[
+    ["https://www.zebis.ch","zebis","Portal für Lehrpersonen mit Unterrichtsmaterial und Hinweisen"],
+    ["https://creativecommons.org/licenses/?lang=de","Creative-Commons-Lizenzen","Welche Bilder und Töne du verwenden darfst"],
+  ]
+},
+{
+  id:"datenschutz", num:"4a", title:"Datenschutz-Check", sub:"Teil des Umsetzungsplans", board:"↳ Datenschutz-Check", subStep:true,
+  lead:"Je weniger Daten, desto besser. Die sicherste Lernapp speichert keine Personendaten und schickt nichts an fremde Server.",
+  cols:[
+    ["Prüffragen",["Werden Namen, Fotos, Stimmen oder Lernstände gespeichert? Wo?","Gehen Daten an Dritte (KI-Dienste, Analyse, Schriften, Werbung)?","Braucht es ein Login? Wenn ja: warum?","Wer hat Zugriff auf die Daten und wie lange bleiben sie?"]],
+    ["Gute Grundsätze",["Datensparsamkeit: nur speichern, was wirklich nötig ist","Lokale Speicherung auf dem Gerät statt Cloud","Keine echten Kinderdaten beim Ausprobieren der KI eingeben","Eltern und Schulleitung transparent informieren"]],
+  ],
+  callout:["Wichtig","Gib keine Namen, Fotos oder Lernberichte von Kindern in einen KI-Chat ein. Arbeite mit erfundenen Beispielen. Die kantonalen Vorgaben zu erlaubten Diensten gelten."],
+  warn:true,
+  check:[
+    "Ich weiss, welche Daten die App speichert (idealerweise keine).",
+    "Es fliessen keine Daten an Dritte, oder dies ist geprüft und erlaubt.",
+    "Ich habe die kantonalen bzw. schulischen Vorgaben angeschaut.",
+    "Die Information an Eltern und Schulleitung ist geplant.",
+  ],
+  links:[
+    ["https://www.educa.ch/de/themen/datenschutz","educa: Datenschutz","Datenschutz in der Schule, Übersicht und Hilfsmittel"],
+    ["https://www.edoeb.admin.ch","EDÖB","Eidgenössischer Datenschutzbeauftragter"],
+    ["https://www.privatim.ch","privatim","Konferenz der kantonalen Datenschutzbeauftragten"],
+  ]
+},
+{
+  id:"prototyp", num:"5", title:"Prototyp", sub:"(Autom.) Testing, Risiko abwägen", board:"Prototyp ⇒ (Autom.) Testing / Risiko abwägen?",
+  lead:"Jetzt wird gebaut, aber klein. Ein erster Prototyp zeigt nur die Kernidee. Lass die KI gleich automatische Tests mitschreiben, damit spätere Änderungen nichts kaputt machen.",
+  cols:[
+    ["Beim Bauen",["In kleinen Schritten vorgehen, nach jedem Schritt ausprobieren","Änderungen beschreiben, nicht selber im Code suchen","Ältere Versionen aufbewahren (z. B. mit Git)"]],
+    ["Automatisiertes Testing",["KI bitten, Tests für die wichtigsten Abläufe zu schreiben","Tests nach jeder Änderung laufen lassen","Auf iPad und im Browser prüfen"]],
+    ["Risiko abwägen",["Was passiert, wenn die App abstürzt? Gibt es einen Plan B?","Kann ein Kind etwas Unpassendes sehen oder eingeben?","Funktioniert sie ohne Internet?","Ist das Risiko im Verhältnis zum Nutzen vertretbar?"]],
+  ],
+  prompt:"Baue jetzt einen ersten, kleinen Prototyp gemäss dem freigegebenen Plan.\n- Nur die Kernfunktion, keine Extras\n- Schreibe automatische Tests für die wichtigsten Abläufe\n- Erkläre mir in einfachen Worten, wie ich die App öffne und teste\n- Liste mögliche Risiken oder Schwachstellen auf",
+  check:[
+    "Der Prototyp läuft auf dem Zielgerät.",
+    "Automatische Tests sind vorhanden und laufen durch.",
+    "Ich habe die Risiken notiert und abgewogen.",
+  ],
+  links:[
+    ["https://claude.ai","Claude","KI-Assistent zum Planen und Programmieren"],
+    ["https://playwright.dev","Playwright","Werkzeug für automatisierte Browser-Tests"],
+    ["https://pages.github.com","GitHub Pages","Kostenloses Hosting für einfache Web-Apps"],
+  ]
+},
+{
+  id:"testen", num:"6", title:"Testen", sub:"Mit echten Nutzer:innen", board:"Testen",
+  lead:"Zuerst selber testen, dann mit Kolleg:innen, dann mit einer kleinen Gruppe Kinder. Beobachte genau: Wo zögern sie? Wo klicken sie daneben?",
+  cols:[
+    ["Testplan",["Selbst alle Abläufe durchspielen, auch «falsche» Eingaben","Eine Kollegin testet ohne Erklärung","Kleine Gruppe Kinder testet im Unterricht","Notizen machen: Was hat funktioniert, was nicht?"]],
+    ["Beobachten statt erklären",["Nicht sofort helfen, zuerst schauen","Wo braucht es Hilfe? Das ist ein Hinweis auf eine Verbesserung","Wie lange bleiben die Kinder motiviert?","Wird das Lernziel erreicht?"]],
+  ],
+  check:[
+    "Ich habe alle Abläufe selbst getestet.",
+    "Mindestens eine andere erwachsene Person hat getestet.",
+    "Eine Gruppe Kinder hat die App ausprobiert.",
+    "Beobachtungen sind notiert.",
+  ],
+  links:[
+    ["https://www.w3.org/WAI/test-evaluate/preliminary/","Schnelltest Barrierefreiheit","Einfache Checks für Zugänglichkeit (W3C)"],
+  ]
+},
+{
+  id:"feedback", num:"7", title:"Feedback", sub:"und zurück zum Wunsch", board:"Feedback ↺ zurück zu Wunsch",
+  lead:"Sammle Rückmeldungen von Kindern, Kolleg:innen und eventuell Eltern. Danach beginnt die nächste Runde: Zurück zu «Wunsch / Spezifikation» mit allem, was du gelernt hast.",
+  cols:[
+    ["Feedback einholen",["Kinder: Daumen hoch / Mitte / runter, oder Smiley-Skala","Kolleg:innen: Was würdest du ändern?","Lernwirkung: Haben die Kinder das Ziel erreicht?"]],
+    ["Feedback verarbeiten",["Wünsche nach Wichtigkeit ordnen","Pro Runde nur wenige Änderungen","Spezifikation nachführen","Bei neuen Daten oder Funktionen: Ethik- und Datenschutz-Check erneut"]],
+  ],
+  prompt:"Hier ist das Feedback aus dem Test mit der Klasse:\n[Feedback einfügen, ohne Namen der Kinder]\n\nOrdne die Punkte nach Wichtigkeit und schlage vor, welche 2–3 Änderungen wir in der nächsten Runde umsetzen. Stelle Rückfragen, wenn etwas unklar ist.",
+  check:[
+    "Feedback von Kindern ist gesammelt.",
+    "Feedback von Erwachsenen ist gesammelt.",
+    "Die nächsten 2–3 Änderungen sind ausgewählt.",
+  ],
+  loop:true,
+  links:[]
+}
+];
+
+// ---------- Storage helpers (per-viewer convenience only) ----------
+const KEY = "lernapp-wegweiser-v1";
+let state = {checks:{}, form:{}, level:"", ethics:{}};
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) state = Object.assign(state, s); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const totalChecks = STEPS.reduce((n,s)=>n+(s.check?s.check.length:0),0);
+
+function stepDone(s){ return s.check && s.check.every((_,i)=>state.checks[s.id+"-"+i]); }
+
+function renderRoute(cur){
+  const ol = document.getElementById("routeList");
+  ol.innerHTML = STEPS.map((s,i)=>`
+    <li class="${s.subStep?"sub":""} ${stepDone(s)?"done":""}">
+      <button type="button" data-i="${i}" ${i===cur?'aria-current="step"':''} aria-label="Station ${s.num}: ${esc(s.title)}">
+        <span class="num">${stepDone(s)?"✓":esc(s.num)}</span>
+        <span class="t">${esc(s.title)}<small>${esc(s.sub)}</small></span>
+      </button>
+    </li>`).join("");
+  ol.querySelectorAll("button").forEach(b=>b.onclick=()=>go(+b.dataset.i));
+  const done = Object.values(state.checks).filter(Boolean).length;
+  document.getElementById("progTxt").textContent = `${done} / ${totalChecks}`;
+  document.getElementById("progBar").style.width = (done/totalChecks*100)+"%";
+}
+
+function specText(){
+  const f = state.form;
+  const v = (k,d)=> (f[k]&&f[k].trim()) ? f[k].trim() : d;
+  return `Ich bin Lehrperson und möchte eine kleine Lernapp entwickeln.
+
+Zielgruppe: ${v("who","[z. B. 2. Klasse, 7–8 Jahre, lesen noch langsam]")}
+Fach / Lernziel: ${v("goal","[z. B. Silben klatschen und zählen]")}
+Geräte: ${v("device","[z. B. iPad im Schulzimmer, oft ohne Internet]")}
+Was die App tun soll: ${v("what","[z. B. Bild + Wort zeigen, Kind tippt Anzahl Silben, sofortige Rückmeldung]")}
+Was sie NICHT tun soll: ${v("not","Keine Logins, keine Personendaten speichern, keine Ranglisten, keine Werbung")}
+Besondere Bedürfnisse: ${v("needs","[z. B. Vorlesefunktion, grosse Tasten]")}
+
+Bitte stelle mir zuerst alle Rückfragen, die du brauchst, bevor du etwas planst oder programmierst.`;
+}
+
+function render(i){
+  const s = STEPS[i];
+  const st = document.getElementById("stage");
+  let h = `<div class="eyebrow">Station ${esc(s.num)} von 7</div>
+    <h2>${esc(s.title)}</h2>
+    <p class="board">${esc(s.board)}</p>
+    <p class="lead">${esc(s.lead)}</p>`;
+
+  if (s.level){
+    h += `<h3>Mein Erfahrungsstand</h3><div class="verdict" role="radiogroup" aria-label="Erfahrungsstand">` +
+      [["neu","Ganz neu"],["etwas","Schon etwas ausprobiert"],["sicher","Ich kenne mich aus"]].map(([k,l])=>
+        `<button type="button" class="chip ${state.level===k?"on":""}" data-level="${k}" role="radio" aria-checked="${state.level===k}">${l}</button>`).join("") + `</div>
+      <p id="levelHint" style="color:var(--muted);margin:8px 0 0"></p>`;
+    h += `<h3>Begriffe zum Aufklappen</h3><div class="gloss">` +
+      s.gloss.map(([t,d])=>`<details><summary>${esc(t)}</summary><p>${esc(d)}</p></details>`).join("") + `</div>`;
+  }
+
+  if (s.cols){
+    h += `<div class="cols">` + s.cols.map(([t,items])=>`<div><h3>${esc(t)}</h3><ul class="plain">${items.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`).join("") + `</div>`;
+  }
+
+  if (s.form){
+    const fld = (k,l,ph,ta)=>`<label class="${ta?"full":""}" for="f-${k}">${l}${ta?`<textarea id="f-${k}" data-k="${k}" placeholder="${esc(ph)}">${esc(state.form[k]||"")}</textarea>`:`<input id="f-${k}" data-k="${k}" placeholder="${esc(ph)}" value="${esc(state.form[k]||"")}">`}</label>`;
+    h += `<h3>Spezifikation ausfüllen</h3><div class="form">
+      ${fld("who","Für wen? (Adressat:innen)","2. Klasse, 7–8 Jahre")}
+      ${fld("goal","Fach / Lernziel","Silben klatschen und zählen")}
+      ${fld("device","Geräte & Umgebung","iPad, oft offline")}
+      ${fld("needs","Besondere Bedürfnisse","Vorlesefunktion, grosse Tasten")}
+      ${fld("what","Was soll die App tun?","Bild + Wort zeigen, Kind tippt Silbenzahl …",true)}
+      ${fld("not","Was soll sie NICHT tun?","Keine Logins, keine Ranglisten …",true)}
+    </div>
+    <h3>Dein Auftrag an die KI</h3>
+    <div class="prompt"><pre id="specOut">${esc(specText())}</pre><button class="btn small" type="button" data-copy="specOut">Kopieren</button></div>`;
+  }
+
+  if (s.ethics){
+    const q = [["need","Braucht es dafür eine App?"],["value","Gibt es einen klaren pädagogischen Mehrwert?"],["harm","Ist sie frei von Beschämung, Druck und Ausschluss?"]];
+    h += `<h3>Ampel: Weitermachen?</h3>` + q.map(([k,l])=>`<div style="margin-top:10px"><b>${l}</b><div class="verdict">` +
+      [["ja","Ja"],["unsicher","Unsicher"],["nein","Nein"]].map(([v,t])=>`<button type="button" class="chip ${v==="nein"?"stop":""} ${state.ethics[k]===v?"on":""}" data-eth="${k}" data-v="${v}" aria-pressed="${state.ethics[k]===v}">${t}</button>`).join("") + `</div></div>`).join("") +
+      `<div class="callout" id="ethVerdict"></div>`;
+  }
+
+  if (s.prompt){
+    h += `<h3>Vorlage für die KI</h3><div class="prompt"><pre id="p-${s.id}">${esc(s.prompt)}</pre><button class="btn small" type="button" data-copy="p-${s.id}">Kopieren</button></div>`;
+  }
+
+  if (s.callout){
+    h += `<div class="callout ${s.warn?"warn":""}"><b class="k">${esc(s.callout[0])}</b>${esc(s.callout[1])}</div>`;
+  }
+
+  if (s.check){
+    h += `<h3>Checkliste</h3><ul class="check">` + s.check.map((c,j)=>{
+      const k = s.id+"-"+j;
+      return `<li><label for="c-${k}"><input type="checkbox" id="c-${k}" data-ck="${k}" ${state.checks[k]?"checked":""}><span>${esc(c)}</span></label></li>`;
+    }).join("") + `</ul>`;
+  }
+
+  if (s.links && s.links.length){
+    h += `<h3>Weiterführend</h3><div class="links">` + s.links.map(([u,t,d])=>`<a href="${esc(u)}" target="_blank" rel="noopener"><b>${esc(t)} ↗</b><span>${esc(d)}</span></a>`).join("") + `</div>`;
+  }
+
+  if (s.loop){
+    h += `<div class="callout warn"><b class="k">Nächste Runde</b>Mit dem Feedback geht es zurück zu Station 2. Passe die Spezifikation an und durchlaufe die Stationen erneut, in der Regel schneller als beim ersten Mal.</div>`;
+  }
+
+  h += `<div class="pager">
+    ${i>0?`<button class="btn" type="button" id="prevBtn">← ${esc(STEPS[i-1].title)}</button>`:`<span></span>`}
+    ${s.loop?`<button class="btn loop" type="button" id="loopBtn">↺ Zurück zu Wunsch / Spezifikation</button>`:
+      `<button class="btn primary" type="button" id="nextBtn">${esc(STEPS[i+1].title)} →</button>`}
+  </div>`;
+
+  st.innerHTML = h;
+
+  // Wire up interactions
+  st.querySelectorAll("[data-ck]").forEach(cb=>cb.onchange=()=>{ state.checks[cb.dataset.ck]=cb.checked; save(); renderRoute(i); });
+  st.querySelectorAll("[data-k]").forEach(inp=>inp.oninput=()=>{ state.form[inp.dataset.k]=inp.value; save(); document.getElementById("specOut").textContent = specText(); });
+  st.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{
+    const el = document.getElementById(b.dataset.copy);
+    const done = ()=>{ b.textContent="Kopiert"; setTimeout(()=>b.textContent="Kopieren",1500); };
+    const fallback = ()=>{ const r=document.createRange(); r.selectNodeContents(el); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent="Markiert, jetzt kopieren"; };
+    try { navigator.clipboard.writeText(el.textContent).then(done, fallback); } catch(e){ fallback(); }
+  });
+  st.querySelectorAll("[data-level]").forEach(b=>b.onclick=()=>{ state.level=b.dataset.level; save(); render(i); });
+  st.querySelectorAll("[data-eth]").forEach(b=>b.onclick=()=>{ state.ethics[b.dataset.eth]=b.dataset.v; save(); render(i); });
+
+  const lh = document.getElementById("levelHint");
+  if (lh) lh.textContent = {neu:"Nimm dir Zeit für die Begriffe unten und plane mehr Zeit für die Beratung (Station 4) ein.", etwas:"Schau die Begriffe kurz durch und achte besonders auf Datenschutz und Testen.", sicher:"Du kannst direkt zu Station 1. Die Checklisten helfen trotzdem, nichts zu vergessen."}[state.level] || "Wähle, wo du stehst. Das verändert die Hinweise.";
+
+  const ev = document.getElementById("ethVerdict");
+  if (ev){
+    const vals = Object.values(state.ethics);
+    if (vals.includes("nein")){ ev.className="callout warn"; ev.innerHTML="<b class='k'>Stopp oder zurück zu Station 2</b>Mindestens eine Frage ist mit Nein beantwortet. Überarbeite die Idee oder wähle eine Lösung ohne App."; }
+    else if (vals.length<3 || vals.includes("unsicher")){ ev.className="callout"; ev.innerHTML="<b class='k'>Noch offen</b>Bespreche die unsicheren Punkte mit einer Kollegin oder Fachperson, bevor du weitergehst."; }
+    else { ev.className="callout"; ev.innerHTML="<b class='k'>Grünes Licht</b>Die Idee hat einen klaren Mehrwert. Weiter zum Umsetzungsplan."; }
+  }
+
+  const p = document.getElementById("prevBtn"), n = document.getElementById("nextBtn"), l = document.getElementById("loopBtn");
+  if (p) p.onclick=()=>go(i-1);
+  if (n) n.onclick=()=>go(i+1);
+  if (l) l.onclick=()=>go(STEPS.findIndex(x=>x.id==="wunsch"));
+  renderRoute(i);
+}
+
+function go(i, fromHash){
+  if (!fromHash && location.hash !== "#"+STEPS[i].id) { location.hash = STEPS[i].id; return; }
+  render(i);
+  const st = document.getElementById("stage");
+  if (!fromHash || document.activeElement !== document.body) { st.focus({preventScroll:true}); }
+  if (window.scrollY > st.offsetTop) window.scrollTo({top: Math.max(0, st.offsetTop-16)});
+}
+function fromHash(){
+  const id = location.hash.slice(1);
+  const i = Math.max(0, STEPS.findIndex(s=>s.id===id));
+  go(i, true);
+}
+window.addEventListener("hashchange", fromHash);
+document.getElementById("resetBtn").onclick = ()=>{ state.checks={}; state.ethics={}; save(); fromHash(); };
+fromHash();
+</script>
+</body>
+</html>
