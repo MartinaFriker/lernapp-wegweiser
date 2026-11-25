@@ -2,7 +2,7 @@
 
 Ein klickbarer Wegweiser für Lehrpersonen: Station für Station von der ersten Idee zur eigenen Lernapp.
 
-0. Erstes Mal? Vokabular & Niveau
+0. Start: Vokabular & Niveau
 1. Vorstellung / Rahmen
 2. Wunsch / Spezifikation (inkl. Adressat:innen), mit Rückfragen-Schlaufe
 3. Ethik-Check: Braucht's das? Pädagogischer Mehrwert
